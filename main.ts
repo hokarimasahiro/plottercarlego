@@ -159,11 +159,11 @@ basic.forever(function () {
     } else {
         watchfont.showNumber2(inExcute)
         basic.pause(5000)
-        for (let COMMAND2 of plotData) {
-            serial.writeLine("" + (COMMAND2))
-            CMD = COMMAND2.split(" ")[0]
-            if (COMMAND2.includes(" ")) {
-                PRM = COMMAND2.split(" ")[1].split(",")
+        for (let plotCommand of plotData) {
+            serial.writeLine("" + (plotCommand))
+            CMD = plotCommand.split(" ")[0]
+            if (plotCommand.includes(" ")) {
+                PRM = plotCommand.split(" ")[1].split(",")
             } else {
                 PRM = []
             }
