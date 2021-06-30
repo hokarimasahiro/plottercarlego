@@ -1,0 +1,26 @@
+{
+    "name": "plotterCarLego",
+    "description": "",
+    "dependencies": {
+        "core": "*",
+        "radio": "*",
+        "microphone": "*",
+        "pxt-watchfont": "github:hokarimasahiro/pxt-watchfont#2b458eef5787353c9592abaf3f176105f102b51b",
+        "pxt-eeprom": "github:hokarimasahiro/pxt-eeprom#4479841d066e61c49dd519aac39070d7077be266",
+        "pxt-neopixelLight": "github:hokarimasahiro/pxt-neopixellight#7c31332d8bf91a8182be33b49f580b752890a123",
+        "bit": "github:hokarimasahiro/pxt-bitoperation#1aaa1b128df94a2d18b603d34e2dae3e738ca420",
+        "pxt-plotterCar": "github:hokarimasahiro/pxt-plottercar#d1cfb2761abc37d1187367bcabc12db0399e1676"
+    },
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "supportedTargets": [
+        "microbit"
+    ],
+    "preferredEditor": "blocksprj"
+}
