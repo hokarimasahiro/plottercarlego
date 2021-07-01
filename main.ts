@@ -1,6 +1,27 @@
-function pause2 (数値: number) {
-    basic.pause(5000)
+function pause2 (回数: number) {
+    inPause = 1
+    for (let index = 0; index < 回数; index++) {
+        basic.pause(100)
+        if (inPause == 0) {
+            break;
+        }
+    }
     neopixel.showColor(neopixel.colors(neopixel.Colors.Black))
+}
+radio.onReceivedNumber(function (receivedNumber) {
+    if (receivedNumber == 5) {
+        chagePlotData()
+    } else if (receivedNumber == 6) {
+        if (inExcute == 0) {
+            inExcute = plotData.length
+        } else {
+            inPause = 0
+        }
+    }
+})
+function chagePlotData () {
+    plotNo = (plotNo + 1) % 8
+    plotData = EEPROM.readStr(plotNo * maxDataSize, maxDataSize).split(LF)
 }
 function pen (action: string) {
     if (action == "up") {
@@ -11,24 +32,23 @@ function pen (action: string) {
         basic.pause(100)
     } else if (action == "red") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.Red))
-        pause2(1)
+        pause2(50)
     } else if (action == "yellor") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.Yellow))
-        pause2(1)
+        pause2(50)
     } else if (action == "green") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.Green))
-        pause2(1)
+        pause2(50)
     } else if (action == "blue") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.Blue))
-        pause2(1)
+        pause2(50)
     } else if (action == "black") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.White))
-        pause2(1)
+        pause2(50)
     }
 }
 input.onButtonPressed(Button.A, function () {
-    plotNo = (plotNo + 1) % 8
-    plotData = EEPROM.readStr(plotNo * maxDataSize, maxDataSize).split(LF)
+    chagePlotData()
 })
 serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
     QUEUE.push(serial.readUntil(serial.delimiters(Delimiters.NewLine)))
@@ -124,6 +144,7 @@ let MODE = 0
 let PRM: string[] = []
 let CMD = ""
 let QUEUE: string[] = []
+let inPause = 0
 let penDownDigree = 0
 let penUpDigree = 0
 let plotData: string[] = []
@@ -145,20 +166,25 @@ maxDataSize = 4096
 LF = String.fromCharCode(10)
 plotData = EEPROM.readStr(plotNo * maxDataSize, maxDataSize).split(LF)
 serial.redirectToUSB()
+radio.setGroup(66)
 penUpDigree = 20
 penDownDigree = 40
 pins.servoWritePin(AnalogPin.P15, penUpDigree)
 neopixel.initNeopixel(DigitalPin.P0, 4)
 neopixel.showColor(neopixel.colors(neopixel.Colors.Black))
 basic.forever(function () {
+    if (inExcute == 0) {
+        radio.sendString(plotData[0].substr(1, 20))
+        basic.showString(plotData[0].substr(1, 20))
+    }
+})
+basic.forever(function () {
     if (QUEUE.length > 0) {
         COMMAND = QUEUE.removeAt(0)
         execCommand()
-    } else if (inExcute == 0) {
-        basic.showString(plotData[0].substr(1, 10))
-    } else {
+    } else if (inExcute > 0) {
         watchfont.showNumber2(inExcute)
-        basic.pause(5000)
+        pause2(10)
         for (let plotCommand of plotData) {
             serial.writeLine("" + (plotCommand))
             CMD = plotCommand.split(" ")[0]
