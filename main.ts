@@ -1,13 +1,3 @@
-function pause2 (回数: number) {
-    inPause = 1
-    for (let index = 0; index < 回数; index++) {
-        basic.pause(100)
-        if (inPause == 0) {
-            break;
-        }
-    }
-    neopixel.showColor(neopixel.colors(neopixel.Colors.Black))
-}
 radio.onReceivedNumber(function (receivedNumber) {
     if (receivedNumber == 5) {
         chagePlotData()
@@ -24,34 +14,43 @@ function chagePlotData () {
     plotData = EEPROM.readStr(plotNo * maxDataSize, maxDataSize).split(LF)
 }
 function pen (action: string) {
-    if (action == "up") {
+    if (action.substr(0, 1) == "u" || action.substr(0, 1) == "U") {
         pins.servoWritePin(AnalogPin.P15, penUpDigree)
-        basic.pause(100)
-    } else if (action == "down") {
+        basic.pause(200)
+    } else if (action.substr(0, 1) == "d" || action.substr(0, 1) == "D") {
         pins.servoWritePin(AnalogPin.P15, penDownDigree)
-        basic.pause(100)
-    } else if (action == "red") {
+        basic.pause(200)
+    } else if (action.substr(0, 1) == "r" || action.substr(0, 1) == "R") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.Red))
-        pause2(50)
-    } else if (action == "yellor") {
+    } else if (action.substr(0, 1) == "y" || action.substr(0, 1) == "Y") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.Yellow))
-        pause2(50)
-    } else if (action == "green") {
+    } else if (action.substr(0, 1) == "g" || action.substr(0, 1) == "G") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.Green))
-        pause2(50)
-    } else if (action == "blue") {
+    } else if (action.substr(0, 3) == "blu" || action.substr(0, 3) == "BLU") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.Blue))
-        pause2(50)
-    } else if (action == "black") {
+    } else if (action.substr(0, 3) == "bla" || action.substr(0, 3) == "BLA") {
         neopixel.showColor(neopixel.colors(neopixel.Colors.White))
-        pause2(50)
     }
 }
 input.onButtonPressed(Button.A, function () {
     chagePlotData()
 })
+function pause2 (回数: number) {
+    inPause = 1
+    for (let index = 0; index < 回数; index++) {
+        basic.pause(100)
+        if (inPause == 0) {
+            break;
+        }
+    }
+    neopixel.showColor(neopixel.colors(neopixel.Colors.Black))
+}
 serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
     QUEUE.push(serial.readUntil(serial.delimiters(Delimiters.NewLine)))
+})
+radio.onReceivedString(function (receivedString) {
+    plotData = [receivedString]
+    inExcute = plotData.length
 })
 input.onButtonPressed(Button.B, function () {
     if (inExcute == 0) {
@@ -69,6 +68,8 @@ function execute () {
         plotterCar.Rotate(parseFloat(PRM[0]))
     } else if (CMD.charAt(0) == "p" || CMD.charAt(0) == "P") {
         pen(PRM[0])
+    } else if (CMD.charAt(0) == "w" || CMD.charAt(0) == "W") {
+        pause2(parseFloat(PRM[0]))
     }
 }
 function execCommand () {
@@ -173,12 +174,6 @@ pins.servoWritePin(AnalogPin.P15, penUpDigree)
 neopixel.initNeopixel(DigitalPin.P0, 4)
 neopixel.showColor(neopixel.colors(neopixel.Colors.Black))
 basic.forever(function () {
-    if (inExcute == 0) {
-        radio.sendString(plotData[0].substr(1, 20))
-        basic.showString(plotData[0].substr(1, 20))
-    }
-})
-basic.forever(function () {
     if (QUEUE.length > 0) {
         COMMAND = QUEUE.removeAt(0)
         execCommand()
@@ -191,7 +186,7 @@ basic.forever(function () {
             if (plotCommand.includes(" ")) {
                 PRM = plotCommand.split(" ")[1].split(",")
             } else {
-                PRM = []
+                PRM = ["0", "0"]
             }
             execute()
             if (inExcute <= 0) {
@@ -201,5 +196,11 @@ basic.forever(function () {
             inExcute += -1
             watchfont.showNumber2(inExcute)
         }
+    }
+})
+basic.forever(function () {
+    if (inExcute == 0) {
+        radio.sendString(plotData[0].substr(1, 20))
+        basic.showString(plotData[0].substr(1, 20))
     }
 })
