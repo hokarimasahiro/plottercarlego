@@ -173,6 +173,7 @@ penDownDigree = 40
 pins.servoWritePin(AnalogPin.P15, penUpDigree)
 neopixel.initNeopixel(DigitalPin.P0, 4)
 neopixel.showColor(neopixel.colors(neopixel.Colors.Black))
+plotterCar.setParameter(8.37, 81)
 plotterCar.Straight(0)
 basic.forever(function () {
     if (QUEUE.length > 0) {
