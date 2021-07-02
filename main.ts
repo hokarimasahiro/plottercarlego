@@ -78,7 +78,6 @@ function execCommand () {
         fileNo = parseFloat(COMMAND.split(",")[1])
         if (CMD == "w" || CMD == "W") {
             MODE = 1
-            address = fileNo * blockSize
             DAT = ""
             basic.showArrow(ArrowNames.South)
             serial.writeLine("$write file=" + fileNo)
@@ -93,52 +92,25 @@ function execCommand () {
             }
             basic.showIcon(IconNames.Heart)
             MODE = 0
-        } else if (CMD == "d" || CMD == "D") {
-            MODE = 3
-            address = bit.hexToNumber(COMMAND.split(",")[1])
-            basic.showArrow(ArrowNames.East)
-            serial.writeLine("")
-            serial.writeLine("addr 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f *0123456789abcdef*")
-            for (let row = 0; row <= 15; row++) {
-                HEX = ""
-                CHAR = ""
-                RAW = EEPROM.readBuf(address, 16)
-                for (let col = 0; col <= 15; col++) {
-                    HEX = "" + HEX + bit.numberToHex(RAW[col], 2) + " "
-                    if (RAW[col] >= 32 && RAW[col] < 127) {
-                        CHAR = "" + CHAR + String.fromCharCode(RAW[col])
-                    } else {
-                        CHAR = "" + CHAR + "."
-                    }
-                }
-                serial.writeLine("" + bit.numberToHex(address, 4) + " " + HEX + "*" + CHAR + "*")
-                address += 16
-            }
-            basic.showIcon(IconNames.Heart)
-            MODE = 0
         }
     } else if (MODE == 1) {
         if (COMMAND == eof || COMMAND == eof2) {
-            EEPROM.writeStr(address, DAT)
+            address = fileNo * blockSize
+            for (let カウンター = 0; カウンター <= Math.ceil(DAT.length / pageSize); カウンター++) {
+                EEPROM.writeStr(address, DAT.substr(カウンター * pageSize, pageSize))
+                address += pageSize
+            }
             basic.showIcon(IconNames.Heart)
-            serial.writeLine("$write " + (address - fileNo * blockSize + DAT.length) + " bytes")
+            serial.writeLine("$write " + DAT.length + " bytes")
             MODE = 0
         } else {
             serial.writeLine("" + (COMMAND))
             DAT = "" + DAT + COMMAND + LF
-            if (DAT.length >= pageSize) {
-                EEPROM.writeStr(address, DAT.substr(0, pageSize))
-                DAT = DAT.substr(pageSize, pageSize)
-                address += pageSize
-            }
         }
     }
 }
-let RAW: number[] = []
-let CHAR = ""
-let HEX = ""
-let DAT = ""
 let address = 0
+let DAT = ""
 let fileNo = 0
 let COMMAND = ""
 let MODE = 0
