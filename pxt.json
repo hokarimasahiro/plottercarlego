@@ -7,9 +7,9 @@
         "microphone": "*",
         "pxt-watchfont": "github:hokarimasahiro/pxt-watchfont#2b458eef5787353c9592abaf3f176105f102b51b",
         "pxt-eeprom": "github:hokarimasahiro/pxt-eeprom#dce8ae1eec6dd6197d5ffd9d4fa7e57e0a2c8eeb",
-        "pxt-neopixelLight": "github:hokarimasahiro/pxt-neopixellight#7c31332d8bf91a8182be33b49f580b752890a123",
+        "pxt-neopixelLight": "github:hokarimasahiro/pxt-neopixellight#e311bba9d8c381aedc50df2086414f42d4f93012",
         "bit": "github:hokarimasahiro/pxt-bitoperation#1aaa1b128df94a2d18b603d34e2dae3e738ca420",
-        "pxt-plotterCar": "github:hokarimasahiro/pxt-plottercar#master"
+        "pxt-plotterCar": "github:hokarimasahiro/pxt-plottercar#810ae1f1601dd39fc3240063391d3dbf597619cd"
     },
     "files": [
         "main.blocks",
@@ -20,7 +20,7 @@
         "test.ts"
     ],
     "targetVersions": {
-        "target": "4.0.16",
+        "target": "4.0.18",
         "targetId": "microbit"
     },
     "supportedTargets": [
